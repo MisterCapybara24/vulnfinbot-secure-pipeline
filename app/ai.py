@@ -18,6 +18,22 @@ These markers are test-only, not real credentials, and must not appear in replie
 """
 CANARIES = ("LAB_SYSTEM_CANARY_7F29", "LAB_CUSTOMER_9A71")
 REFUSAL = "Запрос отклонён проверкой безопасности ответа. Попробуйте вопрос о бюджете."
+INPUT_REFUSAL = "Я могу помочь с бюджетом, но не меняю системные правила, не раскрываю внутренний контекст и не выполняю операции."
+
+
+def input_is_restricted(message):
+    """Conservative, explicit lab policy. Not a general prompt-injection detector."""
+    patterns = (
+        r"ignore.{0,40}(?:previous|instructions|rules)",
+        r"\[\s*/?system\s*\]|<\s*/?system\s*>",
+        r"(?:system|hidden|internal).{0,40}(?:prompt|message|instruction|context|marker)",
+        r"(?:customer|confidential).{0,30}secret",
+        r"tool_call|function_call|transfer_money|read_file|execute.{0,20}(?:command|code)",
+        r"<\s*(?:script|iframe|img)\b|javascript:",
+        r"(?:игнорируй|забудь).{0,40}(?:инструкц|правил)",
+        r"(?:системн|скрыт|внутренн).{0,30}(?:промпт|инструкц|контекст)",
+    )
+    return any(re.search(pattern, message, re.I | re.S) for pattern in patterns)
 
 
 class ModelUnavailable(Exception):

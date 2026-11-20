@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app, jsonify, render_template, request
 
-from app.ai import ModelUnavailable, call_model, validate_output
+from app.ai import INPUT_REFUSAL, ModelUnavailable, call_model, input_is_restricted, validate_output
 
 bp = Blueprint("main", __name__)
 MAX_MESSAGE_LENGTH = 2000
@@ -28,6 +28,8 @@ def chat():
         return jsonify(error="message must be a string"), 400
     if not message.strip() or len(message) > MAX_MESSAGE_LENGTH:
         return jsonify(error="message must contain 1–2000 characters"), 400
+    if input_is_restricted(message):
+        return jsonify(response=INPUT_REFUSAL, backend="policy", model="not-called", safety="blocked")
     try:
         output = call_model(message.strip(), current_app.config)
     except ModelUnavailable:
