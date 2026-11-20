@@ -1,0 +1,123 @@
+name: Mini-VulnFinBot Security Pipeline
+
+on:
+  push:
+    branches: [main, 'security-demo/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AI_BACKEND: ollama
+      OLLAMA_MODEL: phi3:latest
+      RUN_LLM_TESTS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Prepare report directory
+        run: mkdir -p reports && chmod 777 reports
+      - name: Install test and security tools
+        run: python -m pip install -r requirements-dev.txt semgrep
+      - name: Unit and application security tests
+        id: unit
+        continue-on-error: true
+        run: python -m pytest -m 'not llm' -v --junitxml=reports/unit-tests.xml
+      - name: Bandit SAST
+        id: bandit
+        continue-on-error: true
+        run: bandit -r app -f json -o reports/bandit-report.json
+      - name: Semgrep custom security rules
+        id: semgrep
+        continue-on-error: true
+        run: semgrep scan --config security/semgrep/rules.yml --error --metrics=off --json --output reports/semgrep-report.json app/
+      - name: Dependency audit
+        id: dependencies
+        continue-on-error: true
+        run: pip-audit -r requirements.txt -f json -o reports/dependency-report.json
+      - name: Build application image
+        id: build
+        continue-on-error: true
+        run: docker build --pull -t vulnfinbot:${{ github.sha }} .
+      - name: Trivy image vulnerability scan
+        id: trivy
+        if: always() && steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/reports:/reports" aquasec/trivy:latest image --scanners vuln --format json --output /reports/trivy-report.json vulnfinbot:${{ github.sha }}
+          python scripts/check_trivy.py reports/trivy-report.json
+      - name: Start container for DAST
+        id: start
+        if: always() && steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          docker network create lab-network
+          docker run -d --name vulnfinbot --network lab-network -p 127.0.0.1:5000:5000 -e AI_BACKEND=mock vulnfinbot:${{ github.sha }}
+          for i in {1..30}; do curl --fail http://127.0.0.1:5000/health && exit 0; sleep 2; done
+          exit 1
+      - name: OWASP ZAP baseline
+        id: zap
+        if: always() && steps.start.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set +e
+          docker run --rm --network lab-network -v "$PWD/reports:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://vulnfinbot:5000 -J zap-report.json -r zap-report.html -m 1
+          result=$?
+          set -e
+          echo "ZAP exit code: $result (2 means warnings; preserved for review)" | tee reports/zap-exit.txt
+          test "$result" -eq 0 -o "$result" -eq 2
+      - name: Start real Ollama model
+        id: ollama
+        if: always()
+        continue-on-error: true
+        run: |
+          docker run -d --name ollama -p 127.0.0.1:11434:11434 ollama/ollama:latest
+          for i in {1..30}; do curl --fail http://127.0.0.1:11434/api/tags && break; sleep 2; done
+          docker exec ollama ollama pull "$OLLAMA_MODEL"
+          curl --fail http://127.0.0.1:11434/api/tags > reports/ollama-model.json
+      - name: Real AI security evaluation
+        id: ai
+        if: always() && steps.ollama.outcome == 'success'
+        continue-on-error: true
+        run: python -m pytest -m llm -v --junitxml=reports/ai-tests.xml
+      - name: Verify all six required reports
+        id: reports
+        if: always()
+        continue-on-error: true
+        run: python scripts/check_reports.py
+      - name: Upload all security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnfinbot-security-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Enforce final security gate
+        if: always()
+        env:
+          OUTCOMES: ${{ toJSON(steps) }}
+        run: |
+          python - <<'PY'
+          import json, os
+          steps = json.loads(os.environ['OUTCOMES'])
+          required = ['unit','bandit','semgrep','dependencies','build','trivy','start','zap','ollama','ai','reports']
+          failed = [name for name in required if steps.get(name, {}).get('outcome') != 'success']
+          print('Failed or skipped required stages:', failed)
+          raise SystemExit(bool(failed))
+          PY
+      - name: Cleanup test containers
+        if: always()
+        run: docker rm -f vulnfinbot ollama || true

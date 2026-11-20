@@ -1,0 +1,14 @@
+rules:
+  - id: mini-vulnfinbot-no-eval
+    languages: [python]
+    severity: ERROR
+    message: Never evaluate untrusted input. Use explicit parsing and bounded operations.
+    pattern: eval(...)
+    metadata:
+      cwe: CWE-95
+      category: security
+  - id: mini-vulnfinbot-no-exec
+    languages: [python]
+    severity: ERROR
+    message: Executing dynamically generated Python crosses the application capability boundary.
+    pattern: exec(...)
