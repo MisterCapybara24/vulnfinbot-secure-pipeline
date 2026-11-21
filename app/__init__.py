@@ -28,6 +28,9 @@ def create_app(config=None):
             "X-Frame-Options": "DENY",
             "Referrer-Policy": "no-referrer",
             "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Resource-Policy": "same-origin",
             "Cache-Control": "no-store",
         })
         return response
