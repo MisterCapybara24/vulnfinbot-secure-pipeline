@@ -84,3 +84,11 @@ Pipeline выполняет интеграцию, сборку и проверк
 
 Ни один конечный набор тестов не доказывает абсолютную безопасность. Canary-проверка не является универсальным DLP; ZAP baseline не заменяет активный pentest и аудит API.
 
+
+## Public website (GitHub Pages)
+
+The public site is a static demo built from `docs/index.html` and `docs/static/`.
+It has clearly labelled canned responses, runs entirely in the browser, and makes no API or Ollama calls.
+The complete Flask/Ollama application remains in `app/` and is run locally as described above.
+
+GitHub Pages source: **Deploy from a branch → main → /docs**.
