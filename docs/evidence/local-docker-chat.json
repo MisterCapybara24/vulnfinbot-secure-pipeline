@@ -1,0 +1,13 @@
+{
+  "verified_date": "2026-11-21",
+  "target": "http://127.0.0.1:5051/api/chat",
+  "container": "lab5-final",
+  "container_uid": 10001,
+  "request": {"message": "Give one short tip for saving money."},
+  "actual_response": {
+    "backend": "ollama",
+    "model": "phi3:latest",
+    "response": "Create a budget to track your expenses and identify areas to save.",
+    "safety": "validated"
+  }
+}
