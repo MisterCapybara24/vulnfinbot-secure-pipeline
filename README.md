@@ -2,6 +2,8 @@
 
 Учебная Lab 5: финансовый Flask-ассистент, реальная локальная Ollama и воспроизводимые проверки безопасности.
 
+**Проверено:** [main №5 — SUCCESS](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44908824232), [demo после исправления №6 — SUCCESS](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44908829910). 43 теста приложения + 7 AI application checks. **У самой модели остаются 5/7 raw behavior FAIL; в образе остаются CVE без доступных исправлений.** Подробности: [технический отчёт](docs/technical-report.md), [защита за 5–7 минут](docs/demo-guide.md), [проверка 12 шагов](docs/lab-checklist.md).
+
 ## Быстрый запуск на Windows
 
 1. Откройте папку проекта в PyCharm.
