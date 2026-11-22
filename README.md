@@ -2,7 +2,15 @@
 
 Учебная Lab 5: финансовый Flask-ассистент, реальная локальная Ollama и воспроизводимые проверки безопасности.
 
-**Проверено:** [main №5 — SUCCESS](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44908824232), [demo после исправления №6 — SUCCESS](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44908829910). 43 теста приложения + 7 AI application checks. **У самой модели остаются 5/7 raw behavior FAIL; в образе остаются CVE без доступных исправлений.** Подробности: [технический отчёт](docs/technical-report.md), [защита за 5–7 минут](docs/demo-guide.md), [проверка 12 шагов](docs/lab-checklist.md).
+**Актуальный CI:** [main №12 — SUCCESS, 22.11.2026](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44991429940), [demo после исправления №6 — SUCCESS](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44908829910). Исторический подробный аудит №5: 43 теста приложения + 7 AI application checks; 5/7 raw behavior FAIL и CVE без доступных исправлений. Эти числа относятся к сохранённым отчётам №5, а не пересчитаны для №12. Подробности: [технический отчёт](docs/technical-report.md), [защита за 5–7 минут](docs/demo-guide.md), [проверка 12 шагов](docs/lab-checklist.md).
+
+## Актуальный вид сайта — 22 ноября 2026
+
+**[Открыть публичный сайт](https://mistercapybara24.github.io/vulnfinbot-secure-pipeline/)** · **[Все актуальные скриншоты](docs/screenshots/README.md)**
+
+Публичная версия — демочат с готовыми ответами без AI. Полная локальная версия использует Flask и настоящую Ollama. На обеих версиях — космический фон, туманности и падающие звёзды.
+
+![Публичный сайт с актуальным космическим оформлением](docs/screenshots/public-desktop.png)
 
 ## Быстрый запуск на Windows
 

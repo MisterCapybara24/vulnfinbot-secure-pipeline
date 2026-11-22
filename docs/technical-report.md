@@ -80,7 +80,7 @@ Non-Storable Content связан с намеренным запретом ке�
 
 [Пошаговая защита](demo-guide.md), [12 шагов и критерии на 100 баллов](lab-checklist.md), скриншоты в `screenshots/`, исходные findings в `evidence/`. Максимум по заданию — 100 баллов; самостоятельное присвоение оценки не выполнялось.
 
-## Итоговые проверенные результаты
+## Подробный исторический аудит — 21 ноября 2026
 
 Проверено 21 ноября 2026 года. [Основная ветка, запуск №5](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44908824232) — **SUCCESS**, код `e3d5854129f8b4841c1cbce530511c83d87ddb9c`. [Исправленная демонстрационная ветка, запуск №6](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44908829910) — **SUCCESS**, код `ebee9110cf9213136417d73ddd606a10ba930461`. Архивы скачаны, все шесть обязательных файлов проверены.
 
@@ -101,3 +101,12 @@ Trivy считает записи «пакет × CVE». Среди 50 HIGH-за
 Артефакт main: ID `14708283772`, SHA-256 ZIP `e417b4241a8ea7a81a8ec32236f2420aeea10ec2bdd89b3e0c95c36e93c3fa6a`. Артефакт demo-after: ID `14708579661`, SHA-256 ZIP `9d6d21d0bffeb1584c64a6b6458125ecff0fdae3639878248fe0b0d8256a0698`. GitHub хранит их до 21 декабря 2026; локальные копии приложены.
 
 Локальный Docker-контейнер запущен: `/health` вернул 200/healthy, `id` подтвердил UID 10001. В браузере проверены настоящий ответ Ollama и блокировка instruction override; скриншоты сохранены в screenshots/.
+
+
+## Обновление интерфейса и свидетельств — 22 ноября 2026
+
+Интерфейс обновлён: IITU, космический фон, туманности и падающие звёзды. [Публичный сайт](https://mistercapybara24.github.io/vulnfinbot-secure-pipeline/) — статическая версия с явно обозначенным демочатом; локальное Flask-приложение продолжает использовать Ollama.
+
+Для коммита `29451541940044eb91622ce50c43a38b3fab7d1b` подтверждены [Security Pipeline №12 — Success](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44991429940) и [Pages — Success](https://github.com/MisterCapybara24/vulnfinbot-secure-pipeline/actions/runs/44991429439). У №12 доступен artifact `vulnfinbot-security-reports-12`; его содержимое в рамках обновления скриншотов заново не анализировалось. Таблица findings выше относится к аудиту №5.
+
+Все изображения в [галерее скриншотов](screenshots/README.md) пересняты 22.11.2026. Снова получен настоящий ответ `phi3:latest` и проверен отказ на instruction override. Локальный сервер в этой сессии — Flask на порту 5053; предыдущая проверка Docker является историческим свидетельством, а не текущим состоянием процесса.
